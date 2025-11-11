@@ -36,7 +36,8 @@ app.get("/", (req, res) => {
     status: "Server running",
     endpoints: {
       register: "POST /api/users/register",
-      // More endpoints will be added here
+      login: "POST /api/users/login",
+      profile: "GET /api/users/me (requires auth)",
     },
   });
 });

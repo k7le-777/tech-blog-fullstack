@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { User } = require("../../models");
+const authenticate = require("../../middleware/auth");
 
 /**
  * POST /api/users/register
@@ -173,6 +174,51 @@ router.post('/login', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to login',
+      error: error.message
+    });
+  }
+});
+
+
+/**
+ * GET /api/users/me
+ * Get current user's profile (protected route)
+ * Requires: Valid JWT token in Authorization header
+ * Response: { success: boolean, user: object }
+ */
+router.get('/me', authenticate, async (req, res) => {
+  try {
+    // req.user is available because authenticate middleware ran first!
+    const { User } = require('../../models');
+    
+    // Get full user data from database
+    const user = await User.findByPk(req.user.userId, {
+      attributes: { exclude: ['password'] } // Don't send password!
+    });
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+    
+  } catch (error) {
+    console.error('Get profile error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to get user profile',
       error: error.message
     });
   }
