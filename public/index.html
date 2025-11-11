@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech Blog - Home</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">Tech Blog</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li id="nav-dashboard" class="hidden"><a href="/dashboard.html">Dashboard</a></li>
+        <li id="nav-login"><a href="/login.html">Login</a></li>
+        <li id="nav-register"><a href="/register.html">Register</a></li>
+        <li id="nav-logout" class="hidden"><a href="#" onclick="logout()">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>Welcome to Tech Blog</h1>
+      <p>Discover the latest insights in web development, programming, and technology.</p>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="card">
+      <h2>Filter by Category</h2>
+      <div id="categoryFilter" class="categories">
+        <span class="category-badge" onclick="filterPosts(null)">All Posts</span>
+      </div>
+    </div>
+
+    <!-- Posts -->
+    <div id="postsContainer">
+      <div class="loading">Loading posts...</div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/home.js"></script>
+</body>
+</html>

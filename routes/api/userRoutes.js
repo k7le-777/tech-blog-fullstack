@@ -179,6 +179,20 @@ router.post('/login', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/users/logout
+ * Logout user (token invalidation happens client-side)
+ * Response: { success: boolean, message: string }
+ */
+router.post('/logout', authenticate, (req, res) => {
+  // With JWT, logout is handled client-side by removing the token
+  // This endpoint just confirms the action
+  res.json({
+    success: true,
+    message: 'Logged out successfully. Please remove your token.'
+  });
+});
+
 
 /**
  * GET /api/users/me

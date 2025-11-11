@@ -8,7 +8,7 @@ const express = require("express");
 const sequelize = require("./config/connection");
 
 // Import models
-const { User } = require("./models");
+const { User, Post, Comment } = require("./models");
 
 // Import routes
 const routes = require("./routes");
@@ -25,6 +25,8 @@ app.use(express.json());
 
 // Parse URL-encoded bodies (for form data)
 app.use(express.urlencoded({ extended: true }));
+
+app.use(express.static("public"));
 
 // Mount API routes
 app.use("/api", routes);

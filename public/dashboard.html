@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tech Blog - Dashboard</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <header>
+    <nav>
+      <a href="/" class="logo">Tech Blog</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/dashboard.html">Dashboard</a></li>
+        <li><a href="#" onclick="logout()">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h1>My Dashboard</h1>
+      <p>Welcome back, <strong id="username"></strong>!</p>
+    </div>
+
+    <!-- Create Post Form -->
+    <div class="card">
+      <h2>Create New Post</h2>
+      <form id="createPostForm">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" required minlength="3" maxlength="100">
+        </div>
+        
+        <div class="form-group">
+          <label for="content">Content</label>
+          <textarea id="content" required minlength="10"></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label for="categories">Categories (hold Ctrl/Cmd to select multiple)</label>
+          <select id="categories" multiple></select>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Create Post</button>
+      </form>
+    </div>
+
+    <!-- My Posts -->
+    <div class="card">
+      <h2>My Posts</h2>
+      <div id="myPostsContainer">
+        <div class="loading">Loading your posts...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/dashboard.js"></script>
+</body>
+</html>
