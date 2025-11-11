@@ -1,11 +1,10 @@
 const sequelize = require("../config/connection");
-const { User, Post, Comment } = require("../models");
+const { User, Post, Comment, Category } = require("../models");
 
 const seedDatabase = async () => {
   try {
-    // Sync database (force: true will drop existing tables)
     await sequelize.sync({ force: true });
-    console.log("\n Database synced!\n");
+    console.log("\nDatabase synced!\n");
 
     // Create users
     const users = await User.bulkCreate(
@@ -27,10 +26,35 @@ const seedDatabase = async () => {
         },
       ],
       {
-        individualHooks: true, // Trigger password hashing hooks
+        individualHooks: true,
       }
     );
     console.log("Users seeded!");
+
+    // Create categories
+    const categories = await Category.bulkCreate([
+      {
+        name: "JavaScript",
+        description: "All about JavaScript programming",
+      },
+      {
+        name: "Node.js",
+        description: "Server-side JavaScript with Node.js",
+      },
+      {
+        name: "Databases",
+        description: "Database design and management",
+      },
+      {
+        name: "Web Development",
+        description: "General web development topics",
+      },
+      {
+        name: "Security",
+        description: "Web security and authentication",
+      },
+    ]);
+    console.log("Categories seeded!");
 
     // Create posts
     const posts = await Post.bulkCreate([
@@ -60,6 +84,13 @@ const seedDatabase = async () => {
       },
     ]);
     console.log("Posts seeded!");
+
+    // Add categories to posts
+    await posts[0].setCategories([categories[0].id, categories[1].id]); // JS + Node
+    await posts[1].setCategories([categories[1].id, categories[4].id]); // Node + Security
+    await posts[2].setCategories([categories[1].id, categories[2].id]); // Node + DB
+    await posts[3].setCategories([categories[3].id]); // Web Dev
+    console.log("Post categories linked!");
 
     // Create comments
     await Comment.bulkCreate([

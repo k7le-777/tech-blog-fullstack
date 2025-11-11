@@ -1,106 +1,107 @@
 const router = require("express").Router();
-const { Post, User, Comment } = require("../../models");
+const { Post, User, Comment, Category } = require("../../models");
 const authenticate = require("../../middleware/auth");
 
 // ==================== CREATE POST ====================
-/**
- * POST /api/posts
- * Create a new post (requires authentication)
- * Request body: { title, content }
- * Response: { success: boolean, post: object }
- */
-router.post("/", authenticate, async (req, res) => {
+router.post('/', authenticate, async (req, res) => {
   try {
-    const { title, content } = req.body;
-
+    const { title, content, categoryIds } = req.body;  // ← Add categoryIds
+    
     // Validate required fields
     if (!title || !content) {
       return res.status(400).json({
         success: false,
-        message: "Title and content are required",
+        message: 'Title and content are required'
       });
     }
-
-    // Create post (userId from authenticated user)
+    
+    // Create post
     const newPost = await Post.create({
       title,
       content,
-      userId: req.user.userId, // From auth middleware!
+      userId: req.user.userId
     });
-
-    // Get post with author info
-    const postWithAuthor = await Post.findByPk(newPost.id, {
+    
+    // Add categories if provided
+    if (categoryIds && Array.isArray(categoryIds) && categoryIds.length > 0) {
+      await newPost.setCategories(categoryIds);
+    }
+    
+    // Get post with author and categories
+    const postWithDetails = await Post.findByPk(newPost.id, {
       include: [
         {
           model: User,
-          attributes: ["id", "username", "email"],
+          attributes: ['id', 'username', 'email']
         },
-      ],
+        {
+          model: Category,
+          attributes: ['id', 'name'],
+          through: { attributes: [] }  // Don't include join table data
+        }
+      ]
     });
-
+    
     res.status(201).json({
       success: true,
-      message: "Post created successfully",
-      post: postWithAuthor,
+      message: 'Post created successfully',
+      post: postWithDetails
     });
+    
   } catch (error) {
-    console.error("Create post error:", error);
-
-    // Handle Sequelize validation errors
-    if (error.name === "SequelizeValidationError") {
+    console.error('Create post error:', error);
+    
+    if (error.name === 'SequelizeValidationError') {
       return res.status(400).json({
         success: false,
-        message: "Validation error",
-        errors: error.errors.map((e) => e.message),
+        message: 'Validation error',
+        errors: error.errors.map(e => e.message)
       });
     }
-
+    
     res.status(500).json({
       success: false,
-      message: "Failed to create post",
-      error: error.message,
+      message: 'Failed to create post',
+      error: error.message
     });
   }
 });
 
 // ==================== GET ALL POSTS ====================
-/**
- * GET /api/posts
- * Get all posts (public - no auth required)
- * Response: { success: boolean, posts: array }
- */
-router.get("/", async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const posts = await Post.findAll({
       include: [
         {
           model: User,
-          attributes: ["id", "username", "email"],
+          attributes: ['id', 'username', 'email']
         },
+        {
+          model: Category,
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
+        }
       ],
-      order: [["createdAt", "DESC"]], // Newest first
+      order: [['createdAt', 'DESC']]
     });
-
+    
     res.json({
       success: true,
       count: posts.length,
-      posts: posts,
+      posts: posts
     });
+    
   } catch (error) {
-    console.error("Get posts error:", error);
+    console.error('Get posts error:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch posts",
-      error: error.message,
+      message: 'Failed to fetch posts',
+      error: error.message
     });
   }
 });
 
 // ==================== GET SINGLE POST ====================
-/**
- * GET /api/posts/:id
- * Get one post by ID with comments (public - no auth required)
- */
 router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -110,6 +111,11 @@ router.get('/:id', async (req, res) => {
         {
           model: User,
           attributes: ['id', 'username', 'email']
+        },
+        {
+          model: Category,
+          attributes: ['id', 'name'],
+          through: { attributes: [] }
         },
         {
           model: Comment,
