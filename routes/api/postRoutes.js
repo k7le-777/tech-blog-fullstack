@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { Post, User } = require("../../models");
+const { Post, User, Comment } = require("../../models");
 const authenticate = require("../../middleware/auth");
 
 // ==================== CREATE POST ====================
@@ -99,39 +99,47 @@ router.get("/", async (req, res) => {
 // ==================== GET SINGLE POST ====================
 /**
  * GET /api/posts/:id
- * Get one post by ID (public - no auth required)
- * Response: { success: boolean, post: object }
+ * Get one post by ID with comments (public - no auth required)
  */
-router.get("/:id", async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
-
+    
     const post = await Post.findByPk(id, {
       include: [
         {
           model: User,
-          attributes: ["id", "username", "email"],
+          attributes: ['id', 'username', 'email']
         },
-      ],
+        {
+          model: Comment,
+          include: [{
+            model: User,
+            attributes: ['id', 'username', 'email']
+          }],
+          order: [['createdAt', 'ASC']]
+        }
+      ]
     });
-
+    
     if (!post) {
       return res.status(404).json({
         success: false,
-        message: "Post not found",
+        message: 'Post not found'
       });
     }
-
+    
     res.json({
       success: true,
-      post: post,
+      post: post
     });
+    
   } catch (error) {
-    console.error("Get post error:", error);
+    console.error('Get post error:', error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch post",
-      error: error.message,
+      message: 'Failed to fetch post',
+      error: error.message
     });
   }
 });
