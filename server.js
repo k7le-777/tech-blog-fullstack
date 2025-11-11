@@ -8,7 +8,7 @@ const express = require("express");
 const sequelize = require("./config/connection");
 
 // Import models
-const { User, Post, Comment } = require("./models");
+const { User, Post, Comment, Category } = require("./models");
 
 // Import routes
 const routes = require("./routes");
@@ -26,22 +26,15 @@ app.use(express.json());
 // Parse URL-encoded bodies (for form data)
 app.use(express.urlencoded({ extended: true }));
 
+// Serve static files from public directory
 app.use(express.static("public"));
 
 // Mount API routes
 app.use("/api", routes);
 
-// Root route
-app.get("/", (req, res) => {
-  res.json({
-    message: "Tech Blog API",
-    status: "Server running",
-    endpoints: {
-      register: "POST /api/users/register",
-      login: "POST /api/users/login",
-      profile: "GET /api/users/me (requires auth)",
-    },
-  });
+// Catch-all route to serve index.html for client-side routing
+app.get("*", (req, res) => {
+  res.sendFile("index.html", { root: "public" });
 });
 
 // Initialize server
@@ -52,13 +45,14 @@ async function init() {
     console.log("Database connection established");
 
     // Sync models to database
+    // In production, use { alter: true } or migrations instead of { force: false }
     await sequelize.sync({ force: false });
     console.log("All models synchronized");
 
     // Start server
     app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-      console.log(`API available at http://localhost:${PORT}/api`);
+      console.log(`Server running on port ${PORT}`);
+      console.log(`API available at /api`);
     });
   } catch (error) {
     console.error("Error during initialization:", error);

@@ -1,23 +1,22 @@
 {
   "name": "tech-blog-fullstack",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Full-stack tech blog with authentication and categories",
+  "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "seed": "node seeds/seed.js",
     "dev": "node server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Your Name",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "dotenv": "^17.2.3",
-    "express": "^5.1.0",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
-    "mysql2": "^3.15.3",
-    "sequelize": "^6.37.7"
+    "mysql2": "^3.11.5",
+    "sequelize": "^6.37.5"
   }
 }
