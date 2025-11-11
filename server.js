@@ -10,20 +10,33 @@ const sequelize = require("./config/connection");
 // Import models
 const { User } = require("./models");
 
+// Import routes
+const routes = require("./routes");
+
 // Create Express app
 const app = express();
 
 // Get port from environment
 const PORT = process.env.PORT || 3001;
 
-// Test route
+// ===== MIDDLEWARE =====
+// Parse JSON bodies
+app.use(express.json());
+
+// Parse URL-encoded bodies (for form data)
+app.use(express.urlencoded({ extended: true }));
+
+// Mount API routes
+app.use("/api", routes);
+
+// Root route
 app.get("/", (req, res) => {
   res.json({
     message: "Tech Blog API",
     status: "Server running",
-    database: "Connected",
-    models: {
-      User: "Synced",
+    endpoints: {
+      register: "POST /api/users/register",
+      // More endpoints will be added here
     },
   });
 });
@@ -35,14 +48,14 @@ async function init() {
     await sequelize.authenticate();
     console.log("Database connection established");
 
-    // Sync models to database (create tables)
+    // Sync models to database
     await sequelize.sync({ force: false });
     console.log("All models synchronized");
 
     // Start server
     app.listen(PORT, () => {
       console.log(`Server running on http://localhost:${PORT}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+      console.log(`API available at http://localhost:${PORT}/api`);
     });
   } catch (error) {
     console.error("Error during initialization:", error);
