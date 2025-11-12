@@ -1,23 +1,28 @@
-// Import Sequelize
 const Sequelize = require("sequelize");
-
-// Load environment variables
 require("dotenv").config();
 
 let sequelize;
 
-// Check if JawsDB URL exists (production on Render)
-if (process.env.JAWSDB_URL) {
-  // Production: Use JawsDB connection string
-  sequelize = new Sequelize(process.env.JAWSDB_URL, {
-    dialect: "mysql",
+if (process.env.DATABASE_URL) {
+  // Production: Render PostgreSQL
+  sequelize = new Sequelize(process.env.DATABASE_URL, {
+    dialect: "postgres",
     dialectOptions: {
-      decimalNumbers: true,
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
     },
     logging: false,
+    pool: {
+      max: 5,
+      min: 0,
+      acquire: 30000,
+      idle: 10000,
+    },
   });
 } else {
-  // Development: Use local MySQL
+  // Development: Local MySQL (your current setup)
   sequelize = new Sequelize(
     process.env.DB_NAME,
     process.env.DB_USER,
@@ -37,5 +42,4 @@ if (process.env.JAWSDB_URL) {
   );
 }
 
-// Export connection
 module.exports = sequelize;
